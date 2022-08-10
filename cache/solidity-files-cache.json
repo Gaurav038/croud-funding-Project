@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/gaurav/Documents/BlockChainProject/blockchain-resumeProject/croudfunding/contracts/Compaign.sol": {
+      "lastModificationDate": 1660103790575,
+      "contentHash": "8223e2a6a5ab6806738bbd2274ad40ec",
+      "sourceName": "contracts/Compaign.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">0.7.0 <=0.9.0"
+      ],
+      "artifacts": [
+        "Compaign",
+        "CompaignFactory"
+      ]
+    }
+  }
+}
