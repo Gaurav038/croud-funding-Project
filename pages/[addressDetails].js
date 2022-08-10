@@ -58,6 +58,7 @@ export default function Detail({Data, DonationsData}) {
         }
       }))
 
+      console.log('https://ipfs.infura.io/ipfs/' + Data.storyURL)
       fetch('https://ipfs.infura.io/ipfs/' + Data.storyURL)
       .then(res => res.text()).then( data => {setStory(data) } )
       
@@ -66,6 +67,8 @@ export default function Detail({Data, DonationsData}) {
     Request()  
   },[change])
   
+
+  console.log("https://ipfs.infura.io/ipfs/" + Data.image)
   return (
     <DetailWrapper>
       <LeftContainer>
