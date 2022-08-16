@@ -31,7 +31,8 @@ export default function Dashboard() {
 
       const getAllCompaigns = contract.filters.compaignCreated(null, null, Address)
       const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-      const AllData = AllCompaigns.map((e) => {
+      const AllCompaign = AllCompaigns.reverse()
+      const AllData = AllCompaign.map((e) => {
         return {
           title: e.args.title,
           image: e.args.imageURI,
@@ -51,6 +52,7 @@ export default function Dashboard() {
   return (
     <HomeWrapper>
 
+      <Category>Your Generated Funds</Category>
       {/* Cards Container */}
       <CardsWrapper>
 
@@ -62,7 +64,7 @@ export default function Dashboard() {
             <Image 
               alt="crowdfunding dapp"
               layout='fill' 
-              src={"https://ipfs.infura.io/ipfs/" + e.image} 
+              src={"https://gateway.pinata.cloud/ipfs/" + e.image} 
             />
           </CardImg>
           <Title>
@@ -164,4 +166,14 @@ const Button = styled.button`
   color: #fff;
   font-size: 14px;
   font-weight: bold;
+`
+
+const Category = styled.div`
+padding: 15px 12px;
+background-color: #ddd3d3;
+margin: 0px 6px;
+border-radius: 8px;
+font-family: 'Poppins';
+font-weight: 600;
+font-size: 21px;
 `

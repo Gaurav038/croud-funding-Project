@@ -4,7 +4,7 @@ import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components';
 import FormLeftWrapper from './FormComp/FormLeftWrapper';
 import FormRightWrapper from './FormComp/FormRightWrapper';
-import { useWeb3Contract } from "react-moralis"
+import Link from 'next/link';
 import { toast } from 'react-toastify';
 import CompaignFactory from "../../artifacts/contracts/Compaign.sol/CompaignFactory.json"
 
@@ -93,7 +93,7 @@ export default function Form() {
                         </Spinner>
                         : <Address> 
                             <h1>Campaign Started SuccessFully</h1> <h1>{address}</h1>
-                            <Button>Go To Campaign</Button>
+                            <Link passHref href={'/'}><Button>Go To Campaign</Button></Link>
                           </Address>
                 :
                     <FormInputsWrapper>

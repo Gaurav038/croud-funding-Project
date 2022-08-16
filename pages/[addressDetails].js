@@ -4,15 +4,21 @@ import {ethers} from 'ethers';
 import CompaignFactory from '../artifacts/contracts/Compaign.sol/CompaignFactory.json'
 import Compaign from '../artifacts/contracts/Compaign.sol/Compaign.json'
 import { useEffect, useState } from "react";
+import { useMoralis } from "react-moralis"
+import { TailSpin } from 'react-loader-spinner';
 
 
-export default function Detail({Data, DonationsData}) {
+export default function Detail({Data}) {
+  const {account} = useMoralis()
   const [amount, setAmount] = useState();
   const [myDonations, setmyDonations] = useState([]);
   const [story, setStory] = useState('');
   const [change, setChange] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false)
+
 
   const DonateFunds = async() => {
+    setUploadLoading(true)
     try {
       await window.ethereum.request({method: 'eth_requestAccounts'})
       const Web3Provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -27,6 +33,7 @@ export default function Detail({Data, DonationsData}) {
     } catch (error) {
       console.log(error)
     }
+    setUploadLoading(false)
   }
 
   useEffect(() => {
@@ -49,8 +56,9 @@ export default function Detail({Data, DonationsData}) {
 
       const MyDonation = contract.filters.donated(Address)
       const MyAllDonations = await contract.queryFilter(MyDonation)
+      const MyAllDonation = MyAllDonations.reverse()
 
-      setmyDonations(MyAllDonations.map((e) => {
+      setmyDonations(MyAllDonation.map((e) => {
         return {
           donar: e.args.donar,
           amount: ethers.utils.formatEther(e.args.amount),
@@ -58,9 +66,9 @@ export default function Detail({Data, DonationsData}) {
         }
       }))
 
-      console.log('https://ipfs.infura.io/ipfs/' + Data.storyURL)
-      fetch('https://ipfs.infura.io/ipfs/' + Data.storyURL)
-      .then(res => res.text()).then( data => {setStory(data) } )
+      console.log('https://gateway.pinata.cloud/ipfs/' + Data.storyURL)
+      fetch('https://gateway.pinata.cloud/ipfs/' + Data.storyURL)
+      .then(res => res.text()).then( data => {setStory(data.replace(/['"]+/g, '')) } )
       
     }
     
@@ -68,7 +76,6 @@ export default function Detail({Data, DonationsData}) {
   },[change])
   
 
-  console.log("https://ipfs.infura.io/ipfs/" + Data.image)
   return (
     <DetailWrapper>
       <LeftContainer>
@@ -77,7 +84,7 @@ export default function Detail({Data, DonationsData}) {
             alt="crowdfunding dapp"
             layout="fill"
             src={
-              "https://ipfs.infura.io/ipfs/" + Data.image
+              "https://gateway.pinata.cloud/ipfs/" + Data.image
             }
           />
         </ImageSection>
@@ -87,8 +94,10 @@ export default function Detail({Data, DonationsData}) {
         <Title>{Data.title}</Title>
         <DonateSection>
           <Input value={amount} onChange={(e) => setAmount(e.target.value)} type="number" placeholder="Enter Amount To Donate" />
-          <Donate onClick={DonateFunds} >Donate</Donate>
-        </DonateSection>
+        { uploadLoading ? <Donate><TailSpin color='#fff' height={20} /></Donate> 
+        : <Donate onClick={DonateFunds} >Donate</Donate>
+              }   
+     </DonateSection>
         <FundsData>
           <Funds>
             <FundText>Required Amount</FundText>
@@ -101,32 +110,20 @@ export default function Detail({Data, DonationsData}) {
         </FundsData>
         <Donated>
           <LiveDonation>
-            <DonationTitle>Recent Donation</DonationTitle>
-            {DonationsData.map((e) => {
-              return (
-                <Donation key={e.timestamp}>
-                <DonationData>{e.donar.slice(0,6)}...{e.donar.slice(39)}</DonationData>
-                <DonationData>{e.amount} Matic</DonationData>
-                <DonationData>{new Date(e.timestamp * 1000).toLocaleString()}</DonationData>
-              </Donation>
-              )
-            })
-            }
-                  
-          </LiveDonation>
-          <MyDonation>
-            <DonationTitle>My Past Donation</DonationTitle>
+            <DonationTitle>Donation History</DonationTitle>
             
             {myDonations.map((e) => {
               return (
                 <Donation key={e.timestamp}>
-                  <DonationData>{e.donar.slice(0,6)}...{e.donar.slice(39)}</DonationData>
-                  <DonationData>{e.amount} Matic</DonationData>
+                  <DonationData>{account && account.toUpperCase().slice(39)==e.donar.slice(39) ? "You": `${e.donar.slice(0, 6)}...${e.donar.slice(39)}`}</DonationData>
+                  <DonationData>{e.amount} Ether</DonationData>
                   <DonationData>{new Date(e.timestamp * 1000).toLocaleString()}</DonationData>
                 </Donation>
               )
             })}
-          </MyDonation>
+                  
+          </LiveDonation>
+        
         </Donated>
       </RightContainer>
     </DetailWrapper>
@@ -175,9 +172,6 @@ export async function getStaticProps(context) {
   const owner = await contract.owner()
   const recievedAmount = await contract.recievedAmount()
 
-  const Donations = contract.filters.donated()
-  const AllDonations = await contract.queryFilter(Donations)
-
   const Data = {
     address: context.params.addressDetails,
     title,
@@ -188,16 +182,8 @@ export async function getStaticProps(context) {
     owner
   }
 
-  const DonationsData = AllDonations.map((e) => {
-    return {
-      donar: e.args.donar,
-      amount: ethers.utils.formatEther(e.args.amount),
-      timestamp: parseInt(e.args.timestamp)
-    }
-  })
-
   return {
-    props : {Data, DonationsData}
+    props : {Data}
   }
 
 }
@@ -235,7 +221,7 @@ const Title = styled.h1`
 `;
 const DonateSection = styled.div`
   display: flex;
-  width: 100%;
+  width: 40rem;
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
@@ -290,11 +276,7 @@ const Donated = styled.div`
   background-color: ${(props) => props.theme.bgDiv};
 `;
 const LiveDonation = styled.div`
-  height: 65%;
-  overflow-y: auto;
-`;
-const MyDonation = styled.div`
-  height: 35%;
+  height: 75%;
   overflow-y: auto;
 `;
 const DonationTitle = styled.div`

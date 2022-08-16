@@ -8,11 +8,14 @@ import { ethers } from 'ethers';
 import { useState } from 'react';
 import CompaignFactory from "../artifacts/contracts/Compaign.sol/CompaignFactory.json"
 import Link from 'next/link'
+import { useMoralis } from "react-moralis"
 
 
 export default function Index({AllData, HealthData,EducationData,AnimalData, BussinessData}) {
   const [filter, setFilter] = useState(AllData)
+  const {account} = useMoralis()
 
+  // console.log(account.toUpperCase(),"ooooooooooooo")
   return (
     <HomeWrapper>
       {/* Filter Section */}
@@ -29,13 +32,14 @@ export default function Index({AllData, HealthData,EducationData,AnimalData, Bus
       <CardsWrapper>
 
         { filter.map((e) =>  {
+          console.log("https://gateway.pinata.cloud/ipfs/" + e.img)
           return (
             <Card key={e.timestamp} >
               <CardImg>
                 <Image 
                   alt="Crowdfunding dapp"
                   layout='fill' 
-                  src={"https://ipfs.infura.io/ipfs/" + e.img}
+                  src={"https://gateway.pinata.cloud/ipfs/" + e.img}
                 />
               </CardImg>
               <Title>
@@ -43,7 +47,7 @@ export default function Index({AllData, HealthData,EducationData,AnimalData, Bus
               </Title>
               <CardData>
                 <Text>Owner<AccountBoxIcon /></Text> 
-                <Text>{e.owner.slice(0, 6)}...{e.owner.slice(39)}</Text>
+                <Text>{account && account.toUpperCase().slice(39)==e.owner.slice(39) ? "You": `${e.owner.slice(0, 6)}...${e.owner.slice(39)}`}</Text>
               </CardData>
               <CardData>
                 <Text>Amount in Ether<PaidIcon /></Text> 
@@ -79,7 +83,8 @@ export async function getStaticProps() {
 
   const getAllCompaigns = contract.filters.compaignCreated()
   const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-  const AllData = AllCompaigns.map((e) => {
+  const AllCompaign = AllCompaigns.reverse()
+  const AllData = AllCompaign.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -92,7 +97,8 @@ export async function getStaticProps() {
 
   const getEducationCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Education")
   const EducationCompaigns = await contract.queryFilter(getEducationCompaigns)
-  const EducationData = EducationCompaigns.map((e) => {
+  const EducationCompaign = EducationCompaigns.reverse()
+  const EducationData = EducationCompaign.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -105,7 +111,8 @@ export async function getStaticProps() {
 
   const getHealthCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Health")
   const HealthCompaigns = await contract.queryFilter(getHealthCompaigns)
-  const HealthData = HealthCompaigns.map((e) => {
+  const HealthCompaign = HealthCompaigns.reverse()
+  const HealthData = HealthCompaign.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -119,7 +126,8 @@ export async function getStaticProps() {
 
   const getAnimalCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Animal")
   const AnimalCompaigns = await contract.queryFilter(getAnimalCompaigns)
-  const AnimalData = AnimalCompaigns.map((e) => {
+  const AnimalCompaign = AnimalCompaigns.reverse()
+  const AnimalData = AnimalCompaign.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -132,7 +140,8 @@ export async function getStaticProps() {
 
   const getBussinessCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Bussiness")
   const BussinessCompaigns = await contract.queryFilter(getBussinessCompaigns)
-  const BussinessData = BussinessCompaigns.map((e) => {
+  const BussinessCompaign = BussinessCompaigns.reverse()
+  const BussinessData = BussinessCompaign.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -178,13 +187,13 @@ const Category = styled.div`
 `
 const CardsWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
   width: 80%;
   margin-top: 25px;
 `
 const Card = styled.div`
   width: 30%;
+  margin: 0px 15px;
   margin-top: 20px;
   background-color: ${(props) => props.theme.bgDiv};
 

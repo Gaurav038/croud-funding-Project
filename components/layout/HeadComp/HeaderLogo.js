@@ -1,8 +1,11 @@
 import styled from 'styled-components';
+import Link from 'next/link';
 
 const HeaderLogo = () => {
   return (
-    <Logo>Croud-Funding</Logo>
+    <Link passHref href={'/'}>
+      <Logo>Fund-Raising</Logo>
+    </Link>
   )
 }
 

@@ -3,9 +3,7 @@ import { TailSpin } from 'react-loader-spinner';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { FormState } from '../Form';
-import {create as IPFSHTTPClient} from 'ipfs-http-client'
 
-const client = IPFSHTTPClient("https://ipfs.infura.io:5001/api/v0")
 
 const FormRightWrapper = () => {
 
@@ -13,15 +11,38 @@ const FormRightWrapper = () => {
     const [uploadLoading, setUploadLoading] = useState(false)
     const [uploaded, setUploaded] = useState(false)
 
-
     const uploadFiles = async(e) => {
       e.preventDefault()
       setUploadLoading(true)
+      let formData;
 
       if(Handler.form.story !== ''){
         try {
-          const added = await client.add(Handler.form.story)
-          Handler.setStoryUrl(added.path)
+          var data = JSON.stringify({
+            "pinataOptions": {
+              "cidVersion": 1
+            },
+            "pinataMetadata": {
+              "name": "StoryURLS",
+              "keyvalues": {
+                "customKey": "customValue",
+                "customKey2": "customValue2"
+              }
+            },
+            "pinataContent": Handler.form.story
+          });
+          const config = {
+                    method: "POST",
+                    headers: {
+                      'Content-Type': 'application/json', 
+                      pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY,
+                      pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
+                    },
+                    body: data,
+          };
+          const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", config);
+          const result = await response.json();
+          Handler.setStoryUrl(result.IpfsHash)
         } catch (error) {
           toast.warn('Error Uploading Story')
         }
@@ -29,8 +50,20 @@ const FormRightWrapper = () => {
 
       if(Handler.image !== ''){
         try {
-          const added = await client.add(Handler.image)
-          Handler.setImageUrl(added.path)
+          formData = new FormData();
+          formData.append("file", Handler.image);
+          const config = {
+                    method: "POST",
+                    maxContentLength: Infinity,
+                    headers: {
+                      pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY,
+                      pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
+                    },
+            body: formData,
+          };
+          const response = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", config);
+          const data = await response.json();
+          Handler.setImageUrl(data.IpfsHash)
         } catch (error) {
           toast.warn('Error Uploading Image')
         }
@@ -76,6 +109,7 @@ const FormRightWrapper = () => {
       <Button onClick={Handler.startCampaign}>
         Start Campaign
       </Button>
+
     </FormRight>
   )
 }
