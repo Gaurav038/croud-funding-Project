@@ -31,8 +31,8 @@ export default function Dashboard() {
 
       const getAllCompaigns = contract.filters.compaignCreated(null, null, Address)
       const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-      const AllCompaign = AllCompaigns.reverse()
-      const AllData = AllCompaign.map((e) => {
+      // const AllCompaign = AllCompaigns.reverse()
+      const AllData = AllCompaigns.map((e) => {
         return {
           title: e.args.title,
           image: e.args.imageURI,

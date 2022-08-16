@@ -56,9 +56,9 @@ export default function Detail({Data}) {
 
       const MyDonation = contract.filters.donated(Address)
       const MyAllDonations = await contract.queryFilter(MyDonation)
-      const MyAllDonation = MyAllDonations.reverse()
+      // const MyAllDonation = MyAllDonations.reverse()
 
-      setmyDonations(MyAllDonation.map((e) => {
+      setmyDonations(MyAllDonations.map((e) => {
         return {
           donar: e.args.donar,
           amount: ethers.utils.formatEther(e.args.amount),

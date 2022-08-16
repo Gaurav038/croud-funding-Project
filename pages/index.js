@@ -83,8 +83,8 @@ export async function getStaticProps() {
 
   const getAllCompaigns = contract.filters.compaignCreated()
   const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-  const AllCompaign = AllCompaigns.reverse()
-  const AllData = AllCompaign.map((e) => {
+  // const AllCompaign = AllCompaigns.reverse()
+  const AllData = AllCompaigns.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -97,8 +97,8 @@ export async function getStaticProps() {
 
   const getEducationCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Education")
   const EducationCompaigns = await contract.queryFilter(getEducationCompaigns)
-  const EducationCompaign = EducationCompaigns.reverse()
-  const EducationData = EducationCompaign.map((e) => {
+  // const EducationCompaign = EducationCompaigns.reverse()
+  const EducationData = EducationCompaigns.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -111,8 +111,8 @@ export async function getStaticProps() {
 
   const getHealthCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Health")
   const HealthCompaigns = await contract.queryFilter(getHealthCompaigns)
-  const HealthCompaign = HealthCompaigns.reverse()
-  const HealthData = HealthCompaign.map((e) => {
+  // const HealthCompaign = HealthCompaigns.reverse()
+  const HealthData = HealthCompaigns.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -126,8 +126,8 @@ export async function getStaticProps() {
 
   const getAnimalCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Animal")
   const AnimalCompaigns = await contract.queryFilter(getAnimalCompaigns)
-  const AnimalCompaign = AnimalCompaigns.reverse()
-  const AnimalData = AnimalCompaign.map((e) => {
+  // const AnimalCompaign = AnimalCompaigns.reverse()
+  const AnimalData = AnimalCompaigns.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
@@ -140,8 +140,8 @@ export async function getStaticProps() {
 
   const getBussinessCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Bussiness")
   const BussinessCompaigns = await contract.queryFilter(getBussinessCompaigns)
-  const BussinessCompaign = BussinessCompaigns.reverse()
-  const BussinessData = BussinessCompaign.map((e) => {
+  // const BussinessCompaign = BussinessCompaigns.reverse()
+  const BussinessData = BussinessCompaigns.map((e) => {
     return {
       title: e.args.title,
       img: e.args.imageURI,
