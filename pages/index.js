@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
@@ -5,23 +6,56 @@ import PaidIcon from '@mui/icons-material/Paid';
 import EventIcon from '@mui/icons-material/Event';
 import Image from 'next/image';
 import { ethers } from 'ethers';
-import { useState } from 'react';
 import CompaignFactory from "../artifacts/contracts/Compaign.sol/CompaignFactory.json"
 import Link from 'next/link'
 import { useMoralis } from "react-moralis"
 
 
-export default function Index({AllData, HealthData,EducationData,AnimalData, BussinessData}) {
-  const [filter, setFilter] = useState(AllData)
+export default function Index({HealthData,EducationData,AnimalData, BussinessData}) {
   const {account} = useMoralis()
+  
+  const [campaignsData, setCampaignsData] = useState([]);
+  const [filter, setFilter] = useState([])
+  
+  useEffect(() => {
+    const Request = async () => {
+      const provider = new ethers.providers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_GOERLI_RPC_URL
+      )
+    
+      const contract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_ADDRESS,
+          CompaignFactory.abi,
+          provider
+      )
+    
+      const getAllCompaigns = contract.filters.compaignCreated()
+      const AllCompaigns = await contract.queryFilter(getAllCompaigns)
+      const AllCompaign = AllCompaigns.reverse()
+      const AllData = AllCompaign.map((e) => {
+        return {
+          title: e.args.title,
+          img: e.args.imageURI,
+          owner: e.args.owner,
+          timestamp: parseInt(e.args.timestamp),
+          amount: ethers.utils.formatEther(e.args.requiredAmount),
+          address: e.args.compaignAddress     
+        }
+      })
 
-  // console.log(account.toUpperCase(),"ooooooooooooo")
-  return (
+      setCampaignsData(AllData)
+      setFilter(AllData)
+    }
+
+    Request()
+  },[])
+
+    return (
     <HomeWrapper>
       {/* Filter Section */}
       <FilterWrapper>
         <FilterAltIcon style={{fontSize:40}} />
-        <Category onClick={() => setFilter(AllData)} >All</Category>
+        <Category onClick={() => setFilter(campaignsData)} >All</Category>
         <Category onClick={() => setFilter(BussinessData)} >Bussiness</Category>
         <Category onClick={() => setFilter(HealthData)} >Health</Category>
         <Category onClick={() => setFilter(EducationData)} >Education</Category>
@@ -80,20 +114,6 @@ export async function getStaticProps() {
       CompaignFactory.abi,
       provider
   )
-
-  const getAllCompaigns = contract.filters.compaignCreated()
-  const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-  // const AllCompaign = AllCompaigns.reverse()
-  const AllData = AllCompaigns.map((e) => {
-    return {
-      title: e.args.title,
-      img: e.args.imageURI,
-      owner: e.args.owner,
-      timestamp: parseInt(e.args.timestamp),
-      amount: ethers.utils.formatEther(e.args.requiredAmount),
-      address: e.args.compaignAddress     
-    }
-  })
 
   const getEducationCompaigns = contract.filters.compaignCreated(null, null, null, null, null, null, "Education")
   const EducationCompaigns = await contract.queryFilter(getEducationCompaigns)
@@ -154,7 +174,6 @@ export async function getStaticProps() {
 
   return {
     props: {
-      AllData,
       HealthData,
       EducationData,
       AnimalData,

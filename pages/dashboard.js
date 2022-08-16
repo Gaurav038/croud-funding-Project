@@ -31,8 +31,8 @@ export default function Dashboard() {
 
       const getAllCompaigns = contract.filters.compaignCreated(null, null, Address)
       const AllCompaigns = await contract.queryFilter(getAllCompaigns)
-      // const AllCompaign = AllCompaigns.reverse()
-      const AllData = AllCompaigns.map((e) => {
+      const AllCompaign = AllCompaigns.reverse()
+      const AllData = AllCompaign.map((e) => {
         return {
           title: e.args.title,
           image: e.args.imageURI,
@@ -103,13 +103,13 @@ const HomeWrapper = styled.div`
 `
 const CardsWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
   width: 80%;
   margin-top: 25px;
 `
 const Card = styled.div`
   width: 30%;
+  margin: 0px 15px;
   margin-top: 20px;
   background-color: ${(props) => props.theme.bgDiv};
   &:hover{
